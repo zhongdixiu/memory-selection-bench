@@ -1,0 +1,19 @@
+candidate: mem0
+version: 2.0.20
+commit: c7ee362aff94a369af70f13f2b4f853f6793ff4c
+storage:
+  vector_store: qdrant-local
+  history_store: sqlite
+mapping:
+  owner_user_id: user_id
+  source_agent_id: metadata.source_agent_id
+  source_domain_id: metadata.source_domain_id
+  project_id: metadata.project_id
+  source_session_id: metadata.source_session_id
+  source_id: metadata.source_id
+known_limits:
+  - No built-in caller authentication in the OSS library API.
+  - Source event timestamp is metadata, not an OSS conflict-ordering clock.
+  - Expiration is date-granularity; reference_date/as-of search is unsupported in OSS.
+  - No native generic SiliconFlow-compatible remote reranker provider.
+

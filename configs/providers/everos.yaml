@@ -1,0 +1,17 @@
+candidate: everos
+version: 1.3.1
+commit: 5076683ab88d714390573d8f88ff3c470e51129a
+storage:
+  source_of_truth: markdown
+  metadata_store: sqlite-wal
+  search_index: lancedb
+mapping:
+  owner_user_id: message.sender_id/search.user_id
+  source_domain_id: app_id
+  project_id: project_id
+  source_session_id: session_id
+known_limits:
+  - No built-in authentication; server is loopback-only by default.
+  - Search pins one app_id and project_id per request; cross-scope recall requires orchestration.
+  - Direct structured agent-case import is not exposed by the memory add API.
+

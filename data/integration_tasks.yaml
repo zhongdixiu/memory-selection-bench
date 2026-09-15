@@ -1,0 +1,39 @@
+tasks:
+  - id: A
+    title: 项目进展邮件草稿
+    prompt: 请根据我的项目 P1 当前决策，生成一段项目进展邮件草稿。只生成草稿，不调用收发邮件工具。
+    required_tokens: [Email Agent]
+    forbidden_tokens: [P2-日程优先]
+    memories:
+      - scope_kind: project
+        scope_id: P1
+        project_id: P1
+        text: P1 决定先接 Email Agent，暂不自动生成技能。
+      - scope_kind: project
+        scope_id: P2
+        project_id: P2
+        text: P2 的安排代号是 P2-日程优先。
+  - id: B
+    title: 技术报告段落
+    prompt: 请根据我的偏好和长期要求，起草统一记忆项目的技术报告段落。只输出草稿，不调用邮件工具。
+    required_tokens: [指标]
+    forbidden_tokens: []
+    memories:
+      - scope_kind: user_public
+        scope_id: U1
+        text: 我负责统一记忆项目；技术报告必须保留指标。
+      - scope_kind: domain
+        scope_id: email
+        text: 邮件回复尽量简洁；该偏好只适用于邮件。
+  - id: C
+    title: 故障处理建议
+    prompt: 请根据我通常的处理方式和已验证案例，说明遇到 API 限流时怎么处理。不要调用邮件工具。
+    required_tokens: [Retry-After, 转人工]
+    forbidden_tokens: [建议盲目重试]
+    memories:
+      - scope_kind: user_public
+        scope_id: U1
+        text: 成功案例：限流时先读取 Retry-After，再按指定时间重试；没有该字段则转人工。
+      - scope_kind: user_public
+        scope_id: U1
+        text: 失败案例：盲目重试会导致重复提交，不得作为推荐方案。

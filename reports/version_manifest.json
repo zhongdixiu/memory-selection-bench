@@ -1,0 +1,70 @@
+{
+  "host": {
+    "system": "Linux",
+    "release": "6.6.87.1-microsoft-standard-WSL2",
+    "machine": "x86_64"
+  },
+  "mem0": {
+    "root": "/home/zhongdixiu/codes/MemoryBench/mem0",
+    "commit": "c7ee362aff94a369af70f13f2b4f853f6793ff4c",
+    "environment": {
+      "python": "3.11.13",
+      "package": "2.0.20"
+    },
+    "license": {
+      "source": "/home/zhongdixiu/codes/MemoryBench/mem0/LICENSE",
+      "copy": "/home/zhongdixiu/codes/MemoryBench/memory-selection-bench/reports/licenses/mem0-LICENSE",
+      "sha256": "0bbcbe931c353293a2fafce08326181dfeea0e568c566afd4ce8337a70f5e219",
+      "declared": "Apache-2.0"
+    },
+    "dependency_lock": "/home/zhongdixiu/codes/MemoryBench/mem0/poetry.lock",
+    "storage": {
+      "vector": "qdrant-local",
+      "history": "sqlite"
+    }
+  },
+  "everos": {
+    "root": "/home/zhongdixiu/codes/MemoryBench/EverOS",
+    "commit": "5076683ab88d714390573d8f88ff3c470e51129a",
+    "environment": {
+      "python": "3.12.10",
+      "package": "1.3.1"
+    },
+    "license": {
+      "source": "/home/zhongdixiu/codes/MemoryBench/EverOS/LICENSE",
+      "copy": "/home/zhongdixiu/codes/MemoryBench/memory-selection-bench/reports/licenses/everos-LICENSE",
+      "sha256": "748007f17980117469390a385c37423c4bea2b0627cb6be00be315f9e64fc020",
+      "declared": "Apache-2.0"
+    },
+    "dependency_lock": "/home/zhongdixiu/codes/MemoryBench/EverOS/uv.lock",
+    "storage": {
+      "source_of_truth": "markdown",
+      "metadata": "sqlite-wal",
+      "index": "lancedb"
+    }
+  },
+  "email_agent": {
+    "root": "/home/zhongdixiu/codes/email_agent",
+    "python": "/home/zhongdixiu/miniforge3/bin/python"
+  },
+  "models": {
+    "llm": {
+      "model": "qwen3.7-plus",
+      "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      "api_key_env": "DASHSCOPE_API_KEY",
+      "enable_thinking": false,
+      "temperature": 0.0
+    },
+    "embedding": {
+      "model": "BAAI/bge-m3",
+      "dimensions": 1024,
+      "base_url": "https://api.siliconflow.cn/v1",
+      "api_key_env": "SILICONFLOW_API_KEY"
+    },
+    "rerank": {
+      "model": "BAAI/bge-reranker-v2-m3",
+      "base_url": "https://api.siliconflow.cn/v1",
+      "api_key_env": "SILICONFLOW_API_KEY"
+    }
+  }
+}

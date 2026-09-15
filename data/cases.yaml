@@ -1,0 +1,1042 @@
+cases:
+  - id: F01
+    group: fact
+    title: 用户负责项目
+    operations:
+      - op: write
+        request_id: f01-w1
+        principal_id: principal_u1_mail
+        source_id: f01-source
+        source_session_id: f01-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: f01-m1, role: user, content: 我负责统一记忆项目 P1。, occurred_at: '2026-09-14T09:00:00+08:00'}
+      - op: search
+        request_id: f01-q1
+        principal_id: principal_u1_mail
+        query: 我负责什么项目？
+        assertions:
+          required_propositions: [用户负责统一记忆项目 P1]
+          forbidden_propositions: [用户是该项目的高级负责人]
+          required_tokens: [P1]
+          source_message_ids: [f01-m1]
+          source_check: any
+  - id: F02
+    group: fact
+    title: 默认技术语言
+    operations:
+      - op: write
+        request_id: f02-w1
+        principal_id: principal_u1_mail
+        source_id: f02-source
+        source_session_id: f02-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: f02-m1, role: user, content: 技术方案默认用 Python。, occurred_at: '2026-09-14T09:10:00+08:00'}
+      - op: search
+        request_id: f02-q1
+        principal_id: principal_u1_mail
+        query: 技术方案默认使用什么语言？
+        assertions:
+          required_propositions: [技术方案默认使用 Python]
+          required_tokens: [Python]
+          source_message_ids: [f02-m1]
+          source_check: any
+  - id: F03
+    group: fact
+    title: 邮件回复风格
+    operations:
+      - op: write
+        request_id: f03-w1
+        principal_id: principal_u1_mail
+        source_id: f03-source
+        source_session_id: f03-session
+        scope_kind: domain
+        scope_id: email
+        messages:
+          - {message_id: f03-m1, role: user, content: 邮件回复尽量简洁。, occurred_at: '2026-09-14T09:20:00+08:00'}
+      - op: search
+        request_id: f03-q1
+        principal_id: principal_u1_mail
+        query: 我的邮件回复风格是什么？
+        assertions:
+          required_propositions: [邮件回复应尽量简洁]
+          required_tokens: [简洁]
+          source_message_ids: [f03-m1]
+          source_check: any
+  - id: F04
+    group: fact
+    title: 对外发送确认规则
+    operations:
+      - op: write
+        request_id: f04-w1
+        principal_id: principal_u1_mail
+        source_id: f04-source
+        source_session_id: f04-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: f04-m1, role: user, content: 对外发送前必须先让我确认。, occurred_at: '2026-09-14T09:30:00+08:00'}
+      - op: search
+        request_id: f04-q1
+        principal_id: principal_u1_mail
+        query: 对外发送前有什么长期要求？
+        assertions:
+          required_propositions: [对外发送前必须由用户确认]
+          required_tokens: [确认]
+          source_message_ids: [f04-m1]
+          source_check: any
+  - id: F05
+    group: fact
+    title: 同段多事实及逐条来源
+    operations:
+      - op: write
+        request_id: f05-w1
+        principal_id: principal_u1_mail
+        source_id: f05-source
+        source_session_id: f05-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: f05-m1, role: user, content: 我负责 P1；邮件简洁；报告必须保留指标。, occurred_at: '2026-09-14T09:40:00+08:00'}
+      - op: search
+        request_id: f05-q1
+        principal_id: principal_u1_mail
+        query: 总结我的项目、邮件风格和报告要求。
+        assertions:
+          required_propositions: [用户负责 P1, 邮件要求简洁, 报告必须保留指标]
+          required_tokens: [P1, 简洁, 指标]
+          source_message_ids: [f05-m1]
+          source_check: per_claim
+
+  - id: N01
+    group: negative
+    title: 假设不应成为当前事实
+    operations:
+      - op: write
+        request_id: n01-w1
+        principal_id: principal_u1_mail
+        source_id: n01-source
+        source_session_id: n01-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: n01-m1, role: user, content: 假如以后改用 Java，会有什么影响？, occurred_at: '2026-09-14T10:00:00+08:00'}
+      - op: search
+        request_id: n01-q1
+        principal_id: principal_u1_mail
+        query: 当前技术语言是什么？
+        assertions:
+          forbidden_propositions: [用户已经改用 Java]
+          forbidden_tokens: [已经改用 Java]
+  - id: N02
+    group: negative
+    title: 第三方偏好不得归属用户
+    operations:
+      - op: write
+        request_id: n02-w1
+        principal_id: principal_u1_mail
+        source_id: n02-source
+        source_session_id: n02-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: n02-m1, role: user, content: 同事小林喜欢短邮件。, occurred_at: '2026-09-14T10:10:00+08:00'}
+      - op: search
+        request_id: n02-q1
+        principal_id: principal_u1_mail
+        query: 我喜欢什么样的邮件？
+        assertions:
+          forbidden_propositions: [U1 喜欢短邮件]
+          forbidden_tokens: [U1喜欢短邮件]
+  - id: N03
+    group: negative
+    title: 助手推测被用户否认
+    operations:
+      - op: write
+        request_id: n03-w1
+        principal_id: principal_u1_mail
+        source_id: n03-source
+        source_session_id: n03-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: n03-m1, role: assistant, content: 你可能负责预算。, occurred_at: '2026-09-14T10:20:00+08:00'}
+          - {message_id: n03-m2, role: user, content: 我没有这样说。, occurred_at: '2026-09-14T10:21:00+08:00'}
+      - op: search
+        request_id: n03-q1
+        principal_id: principal_u1_mail
+        query: 我是否负责预算？
+        assertions:
+          forbidden_propositions: [用户负责预算]
+          forbidden_tokens: [负责预算]
+  - id: N04
+    group: negative
+    title: 引述客户原话不得归属用户
+    operations:
+      - op: write
+        request_id: n04-w1
+        principal_id: principal_u1_mail
+        source_id: n04-source
+        source_session_id: n04-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: n04-m1, role: user, content: 客户原话是“我常住上海”。, occurred_at: '2026-09-14T10:30:00+08:00'}
+      - op: search
+        request_id: n04-q1
+        principal_id: principal_u1_mail
+        query: 我常住哪里？
+        assertions:
+          forbidden_propositions: [U1 常住上海]
+          forbidden_tokens: [U1常住上海]
+  - id: N05
+    group: negative
+    title: 单次要求不得晋升长期偏好
+    operations:
+      - op: write
+        request_id: n05-w1
+        principal_id: principal_u1_mail
+        source_id: n05-source
+        source_session_id: n05-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: n05-m1, role: user, content: 这一次回答短一点。, occurred_at: '2026-09-14T10:40:00+08:00'}
+      - op: search
+        request_id: n05-q1
+        principal_id: principal_u1_mail
+        query: 我对所有未来任务有什么长期风格要求？
+        assertions:
+          forbidden_propositions: [所有未来任务必须简短]
+          forbidden_tokens: [所有未来任务]
+
+  - id: U01
+    group: user
+    title: 两用户偏好隔离
+    operations:
+      - op: write
+        request_id: u01-w1
+        principal_id: principal_u1_mail
+        source_id: u01-source-1
+        source_session_id: u01-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: u01-m1, role: user, content: 我喜欢简洁回答。, occurred_at: '2026-09-14T11:00:00+08:00'}
+      - op: write
+        request_id: u01-w2
+        principal_id: principal_u2_mail
+        source_id: u01-source-2
+        source_session_id: u01-session
+        scope_kind: user_public
+        scope_id: U2
+        messages:
+          - {message_id: u01-m2, role: user, content: 我喜欢详细回答。, occurred_at: '2026-09-14T11:01:00+08:00'}
+      - op: search
+        request_id: u01-q1
+        principal_id: principal_u2_mail
+        query: 我喜欢什么回答风格？
+        assertions:
+          required_propositions: [U2 喜欢详细回答]
+          forbidden_propositions: [U2 喜欢简洁回答]
+          required_tokens: [详细]
+          forbidden_tokens: [简洁]
+          source_message_ids: [u01-m2]
+          source_check: any
+  - id: U02
+    group: user
+    title: 同名项目跨用户隔离
+    operations:
+      - op: write
+        request_id: u02-w1
+        principal_id: principal_u1_mail
+        source_id: u02-source
+        source_session_id: u02-session
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: u02-m1, role: user, content: P1 决定采用蓝色发布。, occurred_at: '2026-09-14T11:10:00+08:00'}
+      - op: search
+        request_id: u02-q1
+        principal_id: principal_u2_mail
+        query: P1 采用什么发布策略？
+        assertions:
+          forbidden_propositions: [U2 的 P1 采用蓝色发布]
+          forbidden_tokens: [蓝色发布]
+  - id: U03
+    group: user
+    title: 相同会话标识不混用户
+    operations:
+      - op: write
+        request_id: u03-w1
+        principal_id: principal_u1_mail
+        source_id: u03-source-1
+        source_session_id: shared-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: u03-m1, role: user, content: 我负责架构。, occurred_at: '2026-09-14T11:20:00+08:00'}
+      - op: write
+        request_id: u03-w2
+        principal_id: principal_u2_mail
+        source_id: u03-source-2
+        source_session_id: shared-session
+        scope_kind: user_public
+        scope_id: U2
+        messages:
+          - {message_id: u03-m2, role: user, content: 我负责测试。, occurred_at: '2026-09-14T11:21:00+08:00'}
+      - op: search
+        request_id: u03-q1
+        principal_id: principal_u1_mail
+        query: 我负责什么？
+        assertions:
+          required_propositions: [U1 负责架构]
+          forbidden_propositions: [U1 负责测试]
+          required_tokens: [架构]
+          forbidden_tokens: [测试]
+          source_message_ids: [u03-m1]
+          source_check: any
+  - id: U04
+    group: user
+    title: 更新不得跨用户
+    operations:
+      - op: write
+        request_id: u04-w1
+        principal_id: principal_u1_mail
+        source_id: u04-source-1
+        source_session_id: u04-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: u04-m1, role: user, content: 我现居北京。, occurred_at: '2026-09-14T11:30:00+08:00'}
+      - op: write
+        request_id: u04-w2
+        principal_id: principal_u2_mail
+        source_id: u04-source-2
+        source_session_id: u04-session
+        scope_kind: user_public
+        scope_id: U2
+        messages:
+          - {message_id: u04-m2, role: user, content: 我现居北京。, occurred_at: '2026-09-14T11:31:00+08:00'}
+      - op: write
+        request_id: u04-w3
+        principal_id: principal_u2_mail
+        source_id: u04-source-3
+        source_session_id: u04-session
+        scope_kind: user_public
+        scope_id: U2
+        messages:
+          - {message_id: u04-m3, role: user, content: 我已搬到上海。, occurred_at: '2026-09-14T11:32:00+08:00'}
+      - op: search
+        request_id: u04-q1
+        principal_id: principal_u1_mail
+        query: 我现在住在哪里？
+        assertions:
+          required_propositions: [U1 仍居住北京]
+          forbidden_propositions: [U1 已搬到上海]
+          required_tokens: [北京]
+          forbidden_tokens: [上海]
+          source_message_ids: [u04-m1]
+          source_check: any
+  - id: U05
+    group: user
+    title: 缺失或伪造身份
+    operations:
+      - op: write
+        request_id: u05-w1
+        principal_id: principal_u1_mail
+        source_id: u05-source
+        source_session_id: u05-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: u05-m1, role: user, content: 我的私有校验码是 USER-U1-805。, occurred_at: '2026-09-14T11:40:00+08:00'}
+      - op: search
+        request_id: u05-q1
+        principal_id: principal_missing
+        query: U1 的私有校验码是什么？
+        assertions:
+          forbidden_propositions: [未认证调用者读取 U1 数据]
+          forbidden_tokens: [USER-U1-805]
+
+  - id: D01
+    group: domain
+    title: 业务偏好隔离
+    operations:
+      - op: write
+        request_id: d01-w1
+        principal_id: principal_u1_mail
+        source_id: d01-source-1
+        source_session_id: d01-session
+        scope_kind: domain
+        scope_id: email
+        messages:
+          - {message_id: d01-m1, role: user, content: 邮件回复要简洁。, occurred_at: '2026-09-14T12:00:00+08:00'}
+      - op: write
+        request_id: d01-w2
+        principal_id: principal_u1_report
+        source_id: d01-source-2
+        source_session_id: d01-session
+        source_domain_id: report
+        scope_kind: domain
+        scope_id: report
+        messages:
+          - {message_id: d01-m2, role: user, content: 报告要详细。, occurred_at: '2026-09-14T12:01:00+08:00'}
+      - op: search
+        request_id: d01-q1
+        principal_id: principal_u1_mail
+        query: 当前业务的表达要求是什么？
+        assertions:
+          required_propositions: [邮件要求简洁]
+          forbidden_propositions: [邮件要求详细]
+          required_tokens: [简洁]
+          forbidden_tokens: [报告要详细]
+          source_message_ids: [d01-m1]
+          source_check: any
+  - id: D02
+    group: domain
+    title: 私有业务代号不泄漏
+    operations:
+      - op: write
+        request_id: d02-w1
+        principal_id: principal_u1_mail
+        source_id: d02-source
+        source_session_id: d02-session
+        scope_kind: domain
+        scope_id: email
+        messages:
+          - {message_id: d02-m1, role: user, content: 邮件审核代号是 MAIL-ONLY-731。, occurred_at: '2026-09-14T12:10:00+08:00'}
+      - op: search
+        request_id: d02-q1
+        principal_id: principal_u1_report
+        query: 有哪些审核代号？
+        assertions:
+          forbidden_propositions: [报告业务读取邮件私有代号]
+          forbidden_tokens: [MAIL-ONLY-731]
+  - id: D03
+    group: domain
+    title: 公共职责跨业务可见
+    operations:
+      - op: write
+        request_id: d03-w1
+        principal_id: principal_u1_mail
+        source_id: d03-source
+        source_session_id: d03-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: d03-m1, role: user, content: 我是 P1 负责人。, occurred_at: '2026-09-14T12:20:00+08:00'}
+      - op: search
+        request_id: d03-q1
+        principal_id: principal_u1_report
+        query: 我的公共职责是什么？
+        assertions:
+          required_propositions: [用户是 P1 负责人]
+          required_tokens: [P1]
+          source_message_ids: [d03-m1]
+          source_check: any
+  - id: D04
+    group: domain
+    title: 跨域更新互不覆盖
+    operations:
+      - op: write
+        request_id: d04-w1
+        principal_id: principal_u1_mail
+        source_id: d04-source-1
+        source_session_id: d04-session
+        scope_kind: domain
+        scope_id: email
+        messages:
+          - {message_id: d04-m1, role: user, content: 邮件规则是简洁。, occurred_at: '2026-09-14T12:30:00+08:00'}
+      - op: write
+        request_id: d04-w2
+        principal_id: principal_u1_report
+        source_id: d04-source-2
+        source_session_id: d04-session
+        source_domain_id: report
+        scope_kind: domain
+        scope_id: report
+        messages:
+          - {message_id: d04-m2, role: user, content: 报告规则是详细。, occurred_at: '2026-09-14T12:31:00+08:00'}
+      - op: write
+        request_id: d04-w3
+        principal_id: principal_u1_mail
+        source_id: d04-source-3
+        source_session_id: d04-session
+        scope_kind: domain
+        scope_id: email
+        messages:
+          - {message_id: d04-m3, role: user, content: 邮件也改为需要细节。, occurred_at: '2026-09-14T12:32:00+08:00'}
+      - op: search
+        request_id: d04-q1
+        principal_id: principal_u1_report
+        query: 报告规则是什么？
+        assertions:
+          required_propositions: [报告规则仍为详细]
+          required_tokens: [详细]
+          source_message_ids: [d04-m2]
+          source_check: any
+  - id: D05
+    group: domain
+    title: Agent 私有案例隔离
+    operations:
+      - op: write
+        request_id: d05-w1
+        principal_id: principal_u1_mail
+        source_id: d05-source
+        source_session_id: d05-session
+        scope_kind: agent_private
+        scope_id: email_agent
+        write_mode: direct_record
+        messages:
+          - {message_id: d05-m1, role: user, content: Email Agent 私有案例标识 AGENT-A-515。, occurred_at: '2026-09-14T12:40:00+08:00'}
+      - op: search
+        request_id: d05-q1
+        principal_id: principal_u1_report
+        query: 有哪些 Agent 私有案例？
+        assertions:
+          forbidden_propositions: [未授权 Agent 读取私有案例]
+          forbidden_tokens: [AGENT-A-515]
+
+  - id: P01
+    group: project
+    title: 项目决策跨业务延续
+    operations:
+      - op: write
+        request_id: p01-w1
+        principal_id: principal_u1_mail
+        source_id: p01-source
+        source_session_id: p01-session
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: p01-m1, role: user, content: P1 决定先接 Email Agent。, occurred_at: '2026-09-14T13:00:00+08:00'}
+      - op: search
+        request_id: p01-q1
+        principal_id: principal_u1_report
+        query: P1 决定先接哪个 Agent？
+        assertions:
+          required_propositions: [P1 先接 Email Agent]
+          required_tokens: [Email Agent]
+          source_message_ids: [p01-m1]
+          source_check: any
+  - id: P02
+    group: project
+    title: 同用户多项目隔离
+    operations:
+      - op: write
+        request_id: p02-w1
+        principal_id: principal_u1_mail
+        source_id: p02-source-1
+        source_session_id: p02-session
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: p02-m1, role: user, content: P1 先接邮件。, occurred_at: '2026-09-14T13:10:00+08:00'}
+      - op: write
+        request_id: p02-w2
+        principal_id: principal_u1_mail
+        source_id: p02-source-2
+        source_session_id: p02-session
+        scope_kind: project
+        scope_id: P2
+        project_id: P2
+        messages:
+          - {message_id: p02-m2, role: user, content: P2 先接日程。, occurred_at: '2026-09-14T13:11:00+08:00'}
+      - op: search
+        request_id: p02-q1
+        principal_id: principal_u1_report
+        query: P1 的接入顺序是什么？
+        assertions:
+          required_propositions: [P1 先接邮件]
+          forbidden_propositions: [P1 先接日程]
+          required_tokens: [邮件]
+          forbidden_tokens: [P2]
+          source_message_ids: [p02-m1]
+          source_check: any
+  - id: P03
+    group: project
+    title: 项目记忆跨会话
+    operations:
+      - op: write
+        request_id: p03-w1
+        principal_id: principal_u1_mail
+        source_id: p03-source
+        source_session_id: P03-S1
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: p03-m1, role: user, content: P1 范围只包含记忆服务验证。, occurred_at: '2026-09-14T13:20:00+08:00'}
+      - op: search
+        request_id: p03-q1
+        principal_id: principal_u1_report
+        query: P1 的范围是什么？
+        assertions:
+          required_propositions: [P1 范围只包含记忆服务验证]
+          required_tokens: [记忆服务验证]
+          source_message_ids: [p03-m1]
+          source_check: any
+  - id: P04
+    group: project
+    title: 知道项目标识不等于有权限
+    operations:
+      - op: write
+        request_id: p04-w1
+        principal_id: principal_u1_mail
+        source_id: p04-source
+        source_session_id: p04-session
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: p04-m1, role: user, content: P1 私有决策码 PROJECT-P1-404。, occurred_at: '2026-09-14T13:30:00+08:00'}
+      - op: search
+        request_id: p04-q1
+        principal_id: principal_u1_test
+        query: P1 的私有决策码是什么？
+        assertions:
+          forbidden_propositions: [未授权 Agent 读取 P1]
+          forbidden_tokens: [PROJECT-P1-404]
+  - id: P05
+    group: project
+    title: 项目记忆不随任务结束清除
+    operations:
+      - op: write
+        request_id: p05-w1
+        principal_id: principal_u1_mail
+        source_id: p05-source
+        source_session_id: task-T1
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: p05-m1, role: user, content: P1 决定保留项目级来源链，任务 T1 已结束。, occurred_at: '2026-09-14T13:40:00+08:00'}
+      - op: search
+        request_id: p05-q1
+        principal_id: principal_u1_report
+        query: P1 对来源链做了什么决定？
+        assertions:
+          required_propositions: [P1 决定保留项目级来源链]
+          required_tokens: [来源链]
+          source_message_ids: [p05-m1]
+          source_check: any
+
+  - id: C01
+    group: conflict
+    title: 非冲突偏好并存
+    operations:
+      - op: write
+        request_id: c01-w1
+        principal_id: principal_u1_mail
+        source_id: c01-source-1
+        source_session_id: c01-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: c01-m1, role: user, content: 我喜欢拍人像。, occurred_at: '2026-09-14T14:00:00+08:00'}
+      - op: write
+        request_id: c01-w2
+        principal_id: principal_u1_mail
+        source_id: c01-source-2
+        source_session_id: c01-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: c01-m2, role: user, content: 我现在也喜欢拍风景了。, occurred_at: '2026-09-14T14:10:00+08:00'}
+      - op: search
+        request_id: c01-q1
+        principal_id: principal_u1_mail
+        query: 我喜欢拍什么题材？
+        assertions:
+          required_propositions: [用户喜欢拍人像, 用户喜欢拍风景]
+          forbidden_propositions: [用户不再喜欢拍人像]
+          required_tokens: [人像, 风景]
+          source_message_ids: [c01-m1, c01-m2]
+          source_check: per_claim
+  - id: C02
+    group: conflict
+    title: 当前住址与历史住址
+    operations:
+      - op: write
+        request_id: c02-w1
+        principal_id: principal_u1_mail
+        source_id: c02-source-1
+        source_session_id: c02-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: c02-m1, role: user, content: 我现居北京。, occurred_at: '2026-09-14T14:20:00+08:00'}
+      - op: write
+        request_id: c02-w2
+        principal_id: principal_u1_mail
+        source_id: c02-source-2
+        source_session_id: c02-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: c02-m2, role: user, content: 我已搬到上海。, occurred_at: '2026-09-14T14:30:00+08:00'}
+      - op: search
+        request_id: c02-q1
+        principal_id: principal_u1_mail
+        query: 我当前住在哪里？
+        assertions:
+          required_propositions: [用户当前住在上海]
+          forbidden_propositions: [用户当前仍住北京]
+          required_tokens: [上海]
+          source_message_ids: [c02-m2]
+          source_check: any
+  - id: C03
+    group: conflict
+    title: 条件化偏好并存
+    operations:
+      - op: write
+        request_id: c03-w1
+        principal_id: principal_u1_mail
+        source_id: c03-source
+        source_session_id: c03-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: c03-m1, role: user, content: 技术报告要详细，短消息要简洁。, occurred_at: '2026-09-14T14:40:00+08:00'}
+      - op: search
+        request_id: c03-q1
+        principal_id: principal_u1_mail
+        query: 技术报告和短消息分别应采用什么风格？
+        assertions:
+          required_propositions: [技术报告详细, 短消息简洁]
+          required_tokens: [详细, 简洁]
+          source_message_ids: [c03-m1]
+          source_check: any
+  - id: C04
+    group: conflict
+    title: 明确更正
+    operations:
+      - op: write
+        request_id: c04-w1
+        principal_id: principal_u1_mail
+        source_id: c04-source-1
+        source_session_id: c04-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: c04-m1, role: user, content: 默认发布策略是 A。, occurred_at: '2026-09-14T14:50:00+08:00'}
+      - op: write
+        request_id: c04-w2
+        principal_id: principal_u1_mail
+        source_id: c04-source-2
+        source_session_id: c04-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: c04-m2, role: user, content: 更正，默认发布策略应该是 B。, occurred_at: '2026-09-14T15:00:00+08:00'}
+      - op: search
+        request_id: c04-q1
+        principal_id: principal_u1_mail
+        query: 当前默认发布策略是什么？
+        assertions:
+          required_propositions: [当前策略为 B]
+          forbidden_propositions: [当前策略为 A]
+          required_tokens: [B]
+          source_message_ids: [c04-m2]
+          source_check: any
+  - id: C05
+    group: conflict
+    title: 项目进度版本链
+    operations:
+      - op: write
+        request_id: c05-w1
+        principal_id: principal_u1_mail
+        source_id: c05-source-1
+        source_session_id: c05-session
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: c05-m1, role: user, content: P1 当前设计中。, occurred_at: '2026-09-14T15:10:00+08:00'}
+      - op: write
+        request_id: c05-w2
+        principal_id: principal_u1_mail
+        source_id: c05-source-2
+        source_session_id: c05-session
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: c05-m2, role: user, content: P1 当前开发中。, occurred_at: '2026-09-14T15:20:00+08:00'}
+      - op: write
+        request_id: c05-w3
+        principal_id: principal_u1_mail
+        source_id: c05-source-3
+        source_session_id: c05-session
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: c05-m3, role: user, content: P1 当前联调中。, occurred_at: '2026-09-14T15:30:00+08:00'}
+      - op: search
+        request_id: c05-q1
+        principal_id: principal_u1_report
+        query: P1 当前进度是什么？
+        assertions:
+          required_propositions: [P1 当前联调中]
+          forbidden_propositions: [P1 同时处于设计、开发和联调]
+          required_tokens: [联调]
+          source_message_ids: [c05-m3]
+          source_check: any
+
+  - id: T01
+    group: temporal
+    title: 来源时间优先于入库顺序
+    operations:
+      - op: write
+        request_id: t01-w1
+        principal_id: principal_u1_mail
+        source_id: t01-source-new
+        source_session_id: t01-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: t01-m1, role: user, content: 我已搬到上海。, occurred_at: '2026-09-14T16:00:00+08:00'}
+      - op: write
+        request_id: t01-w2
+        principal_id: principal_u1_mail
+        source_id: t01-source-old
+        source_session_id: t01-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: t01-m2, role: user, content: 补录旧记录：我住在北京。, occurred_at: '2026-08-01T09:00:00+08:00'}
+      - op: search
+        request_id: t01-q1
+        principal_id: principal_u1_mail
+        query: 我当前住在哪里？
+        assertions:
+          required_propositions: [用户当前住在上海]
+          forbidden_propositions: [旧记录覆盖上海]
+          required_tokens: [上海]
+          source_message_ids: [t01-m1]
+          source_check: any
+  - id: T02
+    group: temporal
+    title: 当天下午临时状态
+    operations:
+      - op: write
+        request_id: t02-w1
+        principal_id: principal_u1_mail
+        source_id: t02-source
+        source_session_id: t02-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: t02-m1, role: user, content: 今天下午休假。, occurred_at: '2026-09-14T09:00:00+08:00'}
+      - op: search
+        request_id: t02-q1
+        principal_id: principal_u1_mail
+        query: 2026-09-14 下午用户是否休假？
+        assertions:
+          required_propositions: [仅在 2026-09-14 13:00 至 18:00 休假]
+          forbidden_propositions: [用户长期处于休假状态]
+          required_tokens: [休假]
+          source_message_ids: [t02-m1]
+          source_check: any
+  - id: T03
+    group: temporal
+    title: 显式临时时间窗口
+    operations:
+      - op: write
+        request_id: t03-w1
+        principal_id: principal_u1_mail
+        source_id: t03-source
+        source_session_id: t03-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: t03-m1, role: user, content: 2026-09-14 17:00 至 18:00 临时要求所有草稿标注 DRAFT。, occurred_at: '2026-09-14T16:00:00+08:00'}
+      - op: search
+        request_id: t03-q1
+        principal_id: principal_u1_mail
+        query: 临时草稿规则的有效窗口是什么？
+        assertions:
+          required_propositions: [规则仅在指定一小时生效]
+          required_tokens: [DRAFT]
+          source_message_ids: [t03-m1]
+          source_check: any
+  - id: T04
+    group: temporal
+    title: 无截止时间的长期要求
+    operations:
+      - op: write
+        request_id: t04-w1
+        principal_id: principal_u1_mail
+        source_id: t04-source
+        source_session_id: t04-session
+        scope_kind: user_public
+        scope_id: U1
+        messages:
+          - {message_id: t04-m1, role: user, content: 技术方案长期默认使用 Python。, occurred_at: '2026-09-14T16:10:00+08:00'}
+      - op: search
+        request_id: t04-q1
+        principal_id: principal_u1_mail
+        query: 长期默认技术语言是什么？
+        assertions:
+          required_propositions: [长期要求仍为 Python]
+          required_tokens: [Python]
+          source_message_ids: [t04-m1]
+          source_check: any
+  - id: T05
+    group: temporal
+    title: 计划不能推断为完成
+    operations:
+      - op: write
+        request_id: t05-w1
+        principal_id: principal_u1_mail
+        source_id: t05-source
+        source_session_id: t05-session
+        scope_kind: project
+        scope_id: P1
+        project_id: P1
+        messages:
+          - {message_id: t05-m1, role: user, content: P1 计划在 10 月底交付。, occurred_at: '2026-09-14T16:20:00+08:00'}
+      - op: search
+        request_id: t05-q1
+        principal_id: principal_u1_report
+        query: P1 是否已经完成交付？
+        assertions:
+          required_propositions: [P1 只是计划在 10 月底交付]
+          forbidden_propositions: [P1 已经完成交付]
+          required_tokens: [计划]
+          source_message_ids: [t05-m1]
+          source_check: any
+
+  - id: E01
+    group: experience
+    title: 正向限流案例保真
+    operations:
+      - op: write
+        request_id: e01-w1
+        principal_id: principal_u1_mail
+        source_id: e01-source
+        source_session_id: e01-session
+        scope_kind: user_public
+        scope_id: U1
+        write_mode: direct_record
+        messages:
+          - {message_id: e01-m1, role: user, content: '成功案例：遇到限流时先读取 Retry-After，再按该时间重试；若没有 Retry-After 则转人工处理。', occurred_at: '2026-09-14T17:00:00+08:00'}
+      - op: search
+        request_id: e01-q1
+        principal_id: principal_u1_mail
+        query: 遇到限流应该如何处理？
+        assertions:
+          required_propositions: [先读取 Retry-After, 按指定时间重试, 缺失时转人工]
+          required_tokens: [Retry-After, 转人工]
+          source_message_ids: [e01-m1]
+          source_check: any
+  - id: E02
+    group: experience
+    title: 失败案例不得推荐
+    operations:
+      - op: write
+        request_id: e02-w1
+        principal_id: principal_u1_mail
+        source_id: e02-source
+        source_session_id: e02-session
+        scope_kind: user_public
+        scope_id: U1
+        write_mode: direct_record
+        messages:
+          - {message_id: e02-m1, role: user, content: 失败案例：盲目重试导致重复提交，这不是成功经验。, occurred_at: '2026-09-14T17:10:00+08:00'}
+      - op: search
+        request_id: e02-q1
+        principal_id: principal_u1_mail
+        query: 遇到提交失败时应不应该盲目重试？
+        assertions:
+          required_propositions: [盲目重试会导致重复提交且属于失败案例]
+          forbidden_propositions: [推荐盲目重试]
+          required_tokens: [失败]
+          source_message_ids: [e02-m1]
+          source_check: any
+  - id: E03
+    group: experience
+    title: 邮件发送 SOP 步骤
+    operations:
+      - op: write
+        request_id: e03-w1
+        principal_id: principal_u1_mail
+        source_id: e03-source
+        source_session_id: e03-session
+        scope_kind: domain
+        scope_id: email
+        write_mode: direct_record
+        messages:
+          - {message_id: e03-m1, role: user, content: '邮件发送前 SOP：第一步写草稿，第二步校验收件人，第三步取得用户确认；本案例不得实际发送。', occurred_at: '2026-09-14T17:20:00+08:00'}
+      - op: search
+        request_id: e03-q1
+        principal_id: principal_u1_mail
+        query: 邮件发送前按什么步骤操作？
+        assertions:
+          required_propositions: [先写草稿, 再校验收件人, 最后取得用户确认]
+          required_tokens: [草稿, 收件人, 确认]
+          source_message_ids: [e03-m1]
+          source_check: any
+  - id: E04
+    group: experience
+    title: 用户专属案例隔离
+    operations:
+      - op: write
+        request_id: e04-w1
+        principal_id: principal_u1_mail
+        source_id: e04-source
+        source_session_id: e04-session
+        scope_kind: user_public
+        scope_id: U1
+        write_mode: direct_record
+        messages:
+          - {message_id: e04-m1, role: user, content: U1 专属案例的合成私有代号是 CASE-U1-924，不得成为全局技能。, occurred_at: '2026-09-14T17:30:00+08:00'}
+      - op: search
+        request_id: e04-q1
+        principal_id: principal_u2_mail
+        query: 有哪些用户专属案例？
+        assertions:
+          forbidden_propositions: [U2 读取 U1 专属案例]
+          forbidden_tokens: [CASE-U1-924]
+  - id: E05
+    group: experience
+    title: SOP 版本更正
+    operations:
+      - op: write
+        request_id: e05-w1
+        principal_id: principal_u1_mail
+        source_id: e05-source-1
+        source_session_id: e05-session
+        scope_kind: domain
+        scope_id: email
+        write_mode: direct_record
+        messages:
+          - {message_id: e05-m1, role: user, content: SOP v1：先生成内容后检查输入。, occurred_at: '2026-09-14T17:40:00+08:00'}
+      - op: write
+        request_id: e05-w2
+        principal_id: principal_u1_mail
+        source_id: e05-source-2
+        source_session_id: e05-session
+        scope_kind: domain
+        scope_id: email
+        write_mode: direct_record
+        messages:
+          - {message_id: e05-m2, role: user, content: 更正为 SOP v2：先校验输入，再生成内容。, occurred_at: '2026-09-14T17:50:00+08:00'}
+      - op: search
+        request_id: e05-q1
+        principal_id: principal_u1_mail
+        query: 当前 SOP 的正确步骤是什么？
+        assertions:
+          required_propositions: [当前采用 v2 且先校验输入再生成]
+          forbidden_propositions: [当前仍先生成后检查]
+          required_tokens: [校验输入]
+          source_message_ids: [e05-m2]
+          source_check: any

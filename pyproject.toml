@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "memory-selection-bench"
+version = "0.1.0"
+description = "Reproducible Mem0 and EverOS selection benchmark"
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.28,<1",
+  "pydantic>=2.7,<3",
+  "PyYAML>=6,<7",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<9"]
+
+[project.scripts]
+memory-bench = "memory_bench.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/memory_bench"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+

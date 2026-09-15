@@ -1,0 +1,6 @@
+# Controller/test direct dependency snapshot for the validated local interpreter.
+# Candidate dependencies remain isolated in their own existing virtualenvs.
+httpx==0.28.1
+pydantic==2.12.5
+PyYAML==6.0.3
+pytest==8.4.1

@@ -1,0 +1,37 @@
+principals:
+  - id: principal_u1_mail
+    tenant_id: bench-tenant
+    owner_user_id: U1
+    agent_id: email_agent
+    domain_id: email
+    allowed_projects: [P1]
+    allowed_agent_private: [email_agent]
+  - id: principal_u1_report
+    tenant_id: bench-tenant
+    owner_user_id: U1
+    agent_id: report_agent
+    domain_id: report
+    allowed_projects: [P1]
+    allowed_agent_private: [report_agent]
+  - id: principal_u1_test
+    tenant_id: bench-tenant
+    owner_user_id: U1
+    agent_id: test_agent
+    domain_id: test
+    allowed_projects: []
+    allowed_agent_private: [test_agent]
+  - id: principal_u2_mail
+    tenant_id: bench-tenant
+    owner_user_id: U2
+    agent_id: email_agent
+    domain_id: email
+    allowed_projects: [P1]
+    allowed_agent_private: [email_agent]
+  - id: principal_missing
+    tenant_id: bench-tenant
+    owner_user_id: null
+    agent_id: unknown_agent
+    domain_id: email
+    allowed_projects: []
+    allowed_agent_private: []
+
