@@ -70,6 +70,20 @@ class ErrorAdapter:
         return SearchResult(request_id=request.request_id, status=Status.FAIL, hits=[], elapsed_ms=1, error="boom")
 
 
+class TransientErrorAdapter:
+    """First search fails transiently, then returns the expected hit."""
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    async def search(self, request, principal):
+        self.calls += 1
+        if self.calls == 1:
+            return SearchResult(request_id=request.request_id, status=Status.FAIL, hits=[], elapsed_ms=1, error="Error code: 400")
+        hit = SearchHit(native_id="n1", text="技术方案默认使用 Python。", observed_at="2026-09-15T00:00:00+00:00")
+        return SearchResult(request_id=request.request_id, status=Status.PASS, hits=[hit], elapsed_ms=1)
+
+
 def run_case(adapter, tmp_path, config):
     writer = ArtifactWriter(tmp_path, "test-run")
     return asyncio.run(
@@ -112,3 +126,19 @@ def test_transport_failure_is_not_polled(tmp_path):
     result = run_case(adapter, tmp_path, make_config())
     assert result["status"] == Status.FAIL
     assert adapter.calls == 1
+
+
+def test_transient_transport_error_is_retried(tmp_path):
+    adapter = TransientErrorAdapter()
+    result = run_case(adapter, tmp_path, make_config(max_transport_retries=1))
+    assert result["status"] == Status.PASS
+    assert adapter.calls == 2
+    assert result["operations"][0]["attempts"] == 1
+
+
+def test_persistent_transport_failure_respects_retry_budget(tmp_path):
+    adapter = ErrorAdapter()
+    result = run_case(adapter, tmp_path, make_config(max_transport_retries=1))
+    assert result["status"] == Status.FAIL
+    assert adapter.calls == 2
+    assert result["operations"][0]["attempts"] == 1

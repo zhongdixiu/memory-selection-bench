@@ -95,10 +95,19 @@ async def _run_case(adapter, case: Case, principals: dict, *, namespace: str, co
             deadline = float(config.get("visibility_deadline_seconds") or 0)
             intervals = [float(item) for item in (config.get("poll_intervals_seconds") or [0.0])]
             max_attempts = max(1, int(config.get("max_poll_attempts") or 1))
+            transport_retries = max(0, int(config.get("max_transport_retries") or 0))
             poll_started = time.monotonic()
             attempts = 0
             while True:
-                result = await adapter.search(request, principal)
+                # Transport-level retries: a transient provider error (e.g. a
+                # one-off 4xx from the embedding endpoint) must not overwrite
+                # the real evaluation state of an otherwise working search.
+                for transport_attempt in range(transport_retries + 1):
+                    result = await adapter.search(request, principal)
+                    if result.status == Status.PASS or transport_attempt >= transport_retries:
+                        break
+                    writer.event("search_transport_retry", {"case_id": case.id, "request_id": request.request_id, "retry": transport_attempt + 1, "status": result.status, "error": result.error})
+                    await asyncio.sleep(1.0)
                 if track == Track.R1:
                     result = await rerank_result(result, query=request.query, config=config, final_top_k=final_top_k)
                 else:

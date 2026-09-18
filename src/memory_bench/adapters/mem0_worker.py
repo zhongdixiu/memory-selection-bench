@@ -11,30 +11,43 @@ from typing import Any
 
 PREFIX = "@@MEMORY_BENCH@@"
 
+# Disclosed aligned-configuration shim (same class as QwenCompatLLM and the
+# SiliconFlow embedding shim). Out of the box, mem0's ADDITIVE_EXTRACTION_PROMPT
+# (English, with English examples and no language-preservation rule) makes the
+# LLM rewrite Chinese input into English facts, which renders Chinese
+# required-token assertions unmatchable. EverOS's default episode prompt
+# already carries a mandatory "output in the participants' language" rule, so
+# leaving mem0 unaligned would confound the single-variable comparison. The
+# locked version (2.0.20) exposes no full extraction-prompt replacement port,
+# but it does expose the official `MemoryConfig.custom_instructions` field,
+# injected as the highest-priority "## Custom Instructions" section of the
+# extraction prompt. The text below is mem0's own canonical
+# language-preservation wording (verbatim from `use_input_language` in
+# mem0/configs/prompts.py, a flag this version defines but never wires up), so
+# the shim activates behavior mem0 itself specifies rather than inventing new
+# prompt semantics — bringing mem0 to parity with EverOS's out-of-box rule
+# state, not beyond it. Out-of-box English-rewrite behavior is preserved as a
+# capability finding in the pre-shim runs and the gaps table.
+LANGUAGE_ALIGNMENT_INSTRUCTIONS = (
+    "CRITICAL: Respond in the SAME LANGUAGE and SCRIPT as the input messages.\n"
+    "1. Match the language of the user's messages exactly — if they write in Korean, extract in Korean; Japanese in Japanese; etc.\n"
+    "2. Preserve the exact script/alphabet of the input.\n"
+    "3. Do NOT translate or transliterate into English unless the input is already in English.\n"
+    "4. Maintain all quality standards (contextual richness, temporal grounding, etc.) regardless of language.\n"
+    "5. Technical terms, proper nouns, and brand names should be preserved in their original form as used in the input.\n"
+    "6. If the input mixes languages (e.g., Hinglish), preserve both the mixed language style AND the script.\n"
+    "7. For Japanese: explicitly resolve omitted subjects using conversation context.\n"
+    "8. For CJK languages: maintain appropriate formality level from the source text."
+)
+
 
 def emit(payload: dict[str, Any]) -> None:
     print(PREFIX + json.dumps(payload, ensure_ascii=False), flush=True)
 
 
-def build_memory():
-    from mem0.configs.llms.openai import OpenAIConfig
-    from mem0.memory.main import Memory
-    from mem0.utils.factory import EmbedderFactory, LlmFactory
-
-    from memory_bench.adapters.mem0_provider import QwenCompatLLM
-
-    runtime = Path(os.environ["MEMORY_BENCH_RUNTIME_DIR"])
-    runtime.mkdir(parents=True, exist_ok=True)
-    # Keep the schema-recognized provider name and replace only its factory
-    # implementation. MemoryConfig rejects arbitrary provider names before the
-    # factory is reached.
-    LlmFactory.register_provider(
-        "openai",
-        "memory_bench.adapters.mem0_provider.QwenCompatLLM",
-        OpenAIConfig,
-    )
-    EmbedderFactory.provider_to_class["openai"] = "memory_bench.adapters.mem0_provider.SiliconFlowEmbedding"
-    config = {
+def _worker_config(runtime: Path) -> dict[str, Any]:
+    """Build the mem0 MemoryConfig dict. Pure config, no mem0 imports, testable."""
+    return {
         "version": "v1.1",
         "llm": {
             "provider": "openai",
@@ -66,8 +79,29 @@ def build_memory():
             },
         },
         "history_db_path": str(runtime / "history.db"),
+        "custom_instructions": LANGUAGE_ALIGNMENT_INSTRUCTIONS,
     }
-    return Memory.from_config(config)
+
+
+def build_memory():
+    from mem0.configs.llms.openai import OpenAIConfig
+    from mem0.memory.main import Memory
+    from mem0.utils.factory import EmbedderFactory, LlmFactory
+
+    from memory_bench.adapters.mem0_provider import QwenCompatLLM  # noqa: F401  (fail fast if provider module breaks)
+
+    runtime = Path(os.environ["MEMORY_BENCH_RUNTIME_DIR"])
+    runtime.mkdir(parents=True, exist_ok=True)
+    # Keep the schema-recognized provider name and replace only its factory
+    # implementation. MemoryConfig rejects arbitrary provider names before the
+    # factory is reached.
+    LlmFactory.register_provider(
+        "openai",
+        "memory_bench.adapters.mem0_provider.QwenCompatLLM",
+        OpenAIConfig,
+    )
+    EmbedderFactory.provider_to_class["openai"] = "memory_bench.adapters.mem0_provider.SiliconFlowEmbedding"
+    return Memory.from_config(_worker_config(runtime))
 
 
 def write(memory, payload: dict[str, Any]) -> dict[str, Any]:

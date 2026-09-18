@@ -16,4 +16,8 @@ known_limits:
   - Source event timestamp is metadata, not an OSS conflict-ordering clock.
   - Expiration is date-granularity; reference_date/as-of search is unsupported in OSS.
   - No native generic SiliconFlow-compatible remote reranker provider.
+shims:
+  - LLM provider name stays schema-supported "openai"; factory replaced in-worker by QwenCompatLLM (adds Qwen thinking-disable param only).
+  - Embedding shim drops the SiliconFlow-incompatible `dimensions` request field; Qdrant dims stay 1024.
+  - Extraction language alignment via the official MemoryConfig.custom_instructions port, using mem0's own use_input_language wording (defined but unwired in 2.0.20). Out-of-box default rewrites Chinese input into English facts; recorded as a capability finding. Pre-shim runs (up to 20260915T031509Z-mem0-r1-decision-f7884dbc) are retained as out-of-box evidence. See docs/experiment-design.md 统一配置.
 
